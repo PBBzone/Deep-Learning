@@ -1,5 +1,0 @@
-RBU Central Library Rules
-
-Book Allowance: Students can borrow up to 4 books for 14 days.
-
-Overdue Charges: An overdue fine of INR 5 per book per day is charged for late returns.
