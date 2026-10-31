@@ -1,0 +1,289 @@
+DL
+CNN
+ANN
+RNN
+LSTM
+
+python can  store the sentence as a text , but a neural network generally needs numerical input.
+We must convert the sentence into a representation that the model can process.
+This process begins with tokenization.
+
+tokenizer break text into small units called token
+
+depends on the tokenizer, a token can be a complete word, part of word, punchtuations, or another text unit.
+
+sentence
+I love deep learning
+token :
+"I" "love" "deep" "learning"
+
+cov token into num ID
+
+a neural network does not normally work directly with words
+We need to assign each token a integer ID.
+
+suppose our small vocabulary is :
+token		token ID
+I		1
+love		2
+deep		3
+learning	4
+
+
+Practical 2: Create a vocabulary
+
+What is happening internally?
+
+The dictionary stores a mapping from each word to an integer. The list comprehension looks up the ID for every word in the original sentence.
+
+In a real application, the vocabulary is established by a tokenizer and may contain thousands or hundreds of thousands of tokens. Special tokens may also represent padding, unknown words, or boundaries.
+
+Important limitation: Our vocabulary only contains words from this sentence. If we try to look up a new word,such as 'AI', it will fail unless we add it or handle unknown tokens.real tokenizer solve this in more sophisticated ways.
+
+What are embeddings?
+
+Now we reach one of the most important concepts in modern NLP.
+
+Tell students:
+
+"We have converted words into IDs. But an ID alone does not tell the neural network much about the meaning of a word. We need a representation that the model can learn from. That representation is called an embedding."
+
+Understand embeddings through an example
+
+Imagine we have these words:
+
+- king
+- queen
+- apple
+- banana
+
+We want the model to learn useful patterns about how these words are used.
+
+An embedding maps each token ID to a vector of numbers.
+
+For example, imagine the following simplified vectors:
+
+We want the model to learn useful patterns about how these words are used.
+
+An embedding maps each token ID to a vector of numbers.
+
+For example, imagine the following simplified vectors:
+
+Word| Dimension 1| Dimension 2| Dimension 3
+king| 0.8| 0.6| 0.2
+queen| 0.7| 0.7| 0.2
+apple| 0.1| 0.2| 0.9
+banana| 0.2| 0.3| 0.8
+
+These values are invented for illustration. In a real model, embedding dimensions are learned from data and usually do not have such straightforward, human-readable meanings.
+
+The important difference is:
+
+- Token ID: Identifies a token.
+- Embedding: Represents that token using a vector of learned numerical values.
+
+Practical 3: Create Embeddings Using TensorFlow
+
+The actual embedding values will be initialized by TensorFlow and will vary.
+
+Explain the output shape
+
+The output shape is (1, 4, 3).
+
+- 1 means one sentence in the batch.
+- 4 means four tokens in the sentence.
+- 3 means each token has a three-dimensional embedding.
+
+Understand the tensor shape
+
+Value| Meaning
+1| Batch size
+4| Sequence length
+3| Embedding size
+
+https://developers.openai.com/api/docs/guides/embeddings
+
+"embedding_dimension = 8"
+
+---
+
+Lesson 1.5: Why Do We Need Attention?
+
+Now explain the problem that motivates attention.
+
+Consider these two sentences:
+
+Sentence A: "The animal didn't cross the road because it was tired."
+
+Sentence B: "The animal didn't cross the road because it was busy."
+
+The meaning of a word depends on its context. To interpret a sentence, the model needs to build relationships between words.
+
+Older sequence models, such as recurrent neural networks (RNNs), process a sequence step by step. Although they can learn context, maintaining useful information over long sequences can be challenging.
+ Understand Query, Key and Value
+Before showing the formula, use an everyday example.
+
+Imagine a student searching a digital library for information about deep learning.
+- The student has a query: "I want to learn attention mechanisms."
+- Each document has a key: information that helps match it to a search.
+- Each document has a value: the actual information that can be retrieved.
+The search system compares the query with the keys, determines relevance weights, and
+combines information from the values.
+
+This is an analogy, not a literal description of how every search engine works.
+
+What are Q, K and V mathematically?
+In a Transformer, the input token representations are transformed using learned weight matrics:
+
+Q=XMQ,    K=XMK,	V=XWV
+WHERE,
+ X is the matrix of input token representations.
+ WQ is the learned query projection matrix.
+ WK is the learned key projection matrix.
+ WV is the learned value projection matrix.
+
+build attention using TensorFlow , one line at a time
+create a file named attention_practical.py
+
+understand the code
+step 1 = define Q
+Each row is queary vector . we have three quearies , each with two dimentions
+step 2 = define K
+each row is a key vector . we use three keys, each with two dimentions
+step 3 = define V
+each row is a value vector. notice that these values are deliberately different from the query and key vector. this helps demonstrate that score determine how values are combined
+step4 = calculate scores
+scores= tf.matmul(Q,K, transpose_b=true)
+
+tf.matmul performs matrix multiplication. setting transpose_b=True transposes the second matrix for the calculation
+the result has shape (3,3): three queries compared with three keys.
+Step 5 – Scale the scores
+
+scaled_scores = scores / tf.math.sqrt(key_dimension)
+
+We divide by the square root of the key dimension, which is 2 in this example.
+
+Step 6 – Calculate weights
+
+weights = tf.nn.softmax(scaled_scores, axis=-1)
+
+axis=-1 tells TensorFlow to apply softmax across the final dimension, meaning across each row.
+
+
+
+
+what is a transformer?
+a Transformer is a neural network architehture that uses attension  and feed-forward network to process sequensces.
+
+--------------------------------------------------------------------------------DAY 2------------------------------------------------------------------------------------------------------
+
+
+Download ollama
+
+install gemma2
+
+project Setup:
+
+cmd: pip install virtualenv
+
+python -m veny <any name>
+
+after install ollama :-
+1)open cmd  type : ollama list
+2)run the gemma2 2b prompt (ollama run gemma2:2b)
+
+activate myemv after path <\path\activate>
+
+make a requirement.txt file outside myemv:-
+1. langchain
+2.ipykernel
+3. langchain_community
+4. pypdf
+5. langchain-text-splitters
+6. sentence_transformers
+7. langchain_huggingface
+8. faiss-cpu
+9. streamlit
+10. langchain-ollama
+
+Upload to GitHub
+
+-------------------------------------------------------DAY3------------------------------------------------------------------------------
+
+Make a new file named app.py
+
+make sure the gemma2 is running by:-
+
+	1) ollama list (for checking gemma2 is installed)
+	2) ollama run gemma2:2b (for activating it)
+
+after writing code run it by writing in terminal
+	
+						   streamlit run <your file name> (app.py)
+
+
+-------------------------------------------------------------DAY 4------------------------------------------------------------------------
+
+
+Problem statement  (Using RAG)
+
+A college wants an AI assistant that answers student queries using its official documents. The assistant must provide accurate, source-supported answers and must not invent information when the answer is unavailable.
+
+Requirements
+
+- Accept at least five PDF or text documents.
+- Process documents and build a searchable knowledge base.
+- Answer questions using retrieved content.
+- Display supporting source information for answers.
+- Handle questions whose answers are absent from the knowledge base.
+- Provide a simple user interface.
+- Include test cases and a README explaining the design.
+
+Mandatory test scenarios
+
+1. Ask a question whose answer appears clearly in a document.
+2. Ask a question requiring information from two documents.
+3. Ask an unrelated question that cannot be answered from the documents.
+4. Ask a question using different wording from the source text.
+5. Provide two documents with conflicting information and observe how the application responds.
+
+Submission requirements
+
+- Source code and dependency file.
+- README with setup instructions and architecture.
+- Sample documents used for testing.
+- At least 10 test questions with expected results.
+- A short demo and explanation of one technical problem they encountered.
+
+## How to prevent students from relying heavily on GPT
+
+The most effective approach is to assess their reasoning and ability to modify their own implementation, not just the final output.
+
+| Assessment                                  | Marks |
+| ------------------------------------------- | ----- |
+| Working application and RAG pipeline        | 25    |
+| Retrieval quality and source citations      | 20    |
+| Handling missing or conflicting information | 15    |
+| Testing and evaluation                      | 15    |
+| Code explanation and debugging              | 15    |
+| Live modification challenge                 | 10    |
+| Total                                       | 100   |
+
+### Three rules I would enforce
+
+1. Use an unseen document during the demonstration. Give each student a new document shortly before their demo and ask them to ingest it.
+2. Ask them to modify one feature live. For example, change the missing-answer behavior, adjust the retrieval count, or display source metadata.
+3. Ask why, not just what. Why did they choose their chunk size? What happens if retrieval returns irrelevant passages? How did they measure answer quality?
+
+You can permit GPT as a development aid if your course allows it, but require students to disclose its use and explain every important component. A student who cannot explain or modify the code should not receive full marks.
+
+My suggestion: Start with the College Knowledge Assistant, but provide different document sets to different students. That keeps the assignment consistent while making copying less useful.
+
+
+
+
+https://www.slideshare.net/slideshow/deep-learning-az-convolutional-neural-networks-cnn-module-2/110293079 
+
+=----------------------------------------------------------DAY 5--------------------------------------------------------------------------
+
+https://www.tensorflow.org/tutorials/generative/dcgan
